@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import ReactPlaceholder from "react-placeholder/lib";
+
+import useRequestDelay, { REQUEST_STATUS } from "../hooks/useRequestDelay";
 
 import Speaker from "./Speaker";
 
@@ -6,41 +8,34 @@ import { data } from "../../SpeakerData"
 
 function SpeakersList({ showSession }) {
 
-    const [speakersData, setSpeakersData] = useState([]);
+    const {data: speakersData, requestStatus, error, updateRecord} = useRequestDelay(500, data);
 
-    const delay = (ms) => {return new Promise(resolve => setTimeout(resolve, ms))}
-
-    useEffect(() => {
-        async function delayFunk() {
-            await delay(1599)
-            setSpeakersData(data)
-        }
-        delayFunk()
-    })
-
-    function onFavoriteToggle(id) {
-        const currentSpeakerRecord = speakersData.find((rec) => { return rec.id == id })
-
-        const newSpeakerRecord = { ...currentSpeakerRecord, favorite : !currentSpeakerRecord.favorite}
-
-        const newSpeakerData = speakersData.map((rec) => {
-            return rec.id === id ? newSpeakerRecord : rec
-        })
-
-        setSpeakersData(newSpeakerData);
+    if(requestStatus === REQUEST_STATUS.ERROR) {
+        return (
+            <div className="text-danger">
+                Error: <b>An error has occurred. {error}</b>
+            </div>
+        )
     }
+
+    //if(isLoading) { return (<div>Loading</div>)}
 
     return (
         <div className="container speakers-list">
+            <ReactPlaceholder type="media" rows={4} ready={requestStatus === REQUEST_STATUS.SUCCESS} className="speakerslist-placeholder">
             <div className="row">
                 {speakersData.map(function (speaker) {
                     return (
-                        <Speaker key={speaker.id} speaker={speaker} showSession={showSession} onFavoriteToggle={() => {
-                            onFavoriteToggle(speaker.id)
+                        <Speaker key={speaker.id} speaker={speaker} showSession={showSession} onFavoriteToggle={(doneCallBack) => {
+                            updateRecord({
+                                ...speaker,
+                                favorite : !speaker.favorite
+                            }, doneCallBack)
                         }} />
                     )
                 })}
             </div>
+            </ReactPlaceholder>
         </div>
     )
 }

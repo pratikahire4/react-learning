@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 function Session({ title, room }) {
     return (
         <span className="session w-100">
@@ -6,7 +8,7 @@ function Session({ title, room }) {
     )
 }
 
-function Sessions({sessions}) {
+function Sessions({ sessions }) {
     return (
         <div className="sessionBox card h-250">
             <Session {...sessions[0]} />
@@ -22,12 +24,24 @@ function SpeakerImage({ id, first, last }) {
     )
 }
 
-function SpeakerFavorite({favorite, onFavoriteToggle}) {
+function SpeakerFavorite({ favorite, onFavoriteToggle }) {
+
+    const [inTransition, setInTransition] = useState(false);
+
+    function doneCallBack() {
+        setInTransition(false)
+        console.log("In speakerFavorite doneCallBack")
+    }
+
     return (
         <div className="action padB1">
-            <span onClick={onFavoriteToggle}>
+            <span onClick={function () {
+                setInTransition(true)
+                return onFavoriteToggle(doneCallBack)
+            }}>
                 <i className={favorite === true ? "fa fa-star orange" : "fa fa-star-o orange"}></i>{" "}
                 Favorite {" "}
+                {inTransition ? <span className="fas fa-circle-notch fa-spin"></span> : null}
             </span>
         </div>
     )
@@ -61,7 +75,7 @@ function SpeakerDemographics({ first, last, bio, company, twitterHandle, favorit
     )
 }
 
-function Speaker({speaker, showSession, onFavoriteToggle}) {
+function Speaker({ speaker, showSession, onFavoriteToggle }) {
 
     const { id, first, last, sessions } = speaker;
 
@@ -71,8 +85,8 @@ function Speaker({speaker, showSession, onFavoriteToggle}) {
                 <SpeakerImage id={id} first={first} last={last}></SpeakerImage>
                 <SpeakerDemographics {...speaker} onFavoriteToggle={onFavoriteToggle}></SpeakerDemographics>
             </div>
-            {showSession === true ? 
-                <Sessions sessions={sessions}/> : null
+            {showSession === true ?
+                <Sessions sessions={sessions} /> : null
             }
         </div>
     )
