@@ -91,7 +91,7 @@ function SpeakerDemographics({ first, last, bio, company, twitterHandle, favorit
 function Speaker({ speaker, onFavoriteToggle }) {
 
     const { id, first, last, sessions } = speaker;
-    const {showSession} = useContext(SpeakerFilterContext);
+    const { showSession } = useContext(SpeakerFilterContext);
 
     return (
         <div key={id} className="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-sm-12 col-xs-12">
